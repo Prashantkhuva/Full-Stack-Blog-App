@@ -55,7 +55,7 @@ export class AppwriteService {
 
   async deletePost(slug) {
     try {
-      return await this.database.deleteDocument({
+      await this.database.deleteDocument({
         databaseId: conf.appWriteDatabaseId,
         collectionId: conf.appWriteCollectionId,
         slug,
@@ -64,6 +64,8 @@ export class AppwriteService {
       return true;
     } catch (error) {
       console.log("Appwrite service :: deletePost :: error", error);
+
+      return false;
     }
   }
 
@@ -72,10 +74,12 @@ export class AppwriteService {
       return await this.database.getDocument({
         databaseId: conf.appWriteDatabaseId,
         collectionId: conf.appWriteCollectionId,
-        slug,
+        documentId: slug,
       });
     } catch (error) {
       console.log("Appwrite service :: getPost :: error", error);
+
+      return false;
     }
   }
 
@@ -88,6 +92,8 @@ export class AppwriteService {
       });
     } catch (error) {
       console.log("Appwrite service :: getPosts :: error ", error);
+
+      return false;
     }
   }
 
@@ -102,23 +108,29 @@ export class AppwriteService {
       });
     } catch (error) {
       console.log("Appwrite service :: uplaoadFile :: error ", error);
+
+      return false;
     }
   }
 
   async deleteFile(fileId) {
     try {
-      return await this.bucket.deleteFile({
+      await this.bucket.deleteFile({
         bucketId: conf.appWriteBucketId,
         fileId,
       });
+
+      return true;
     } catch (error) {
       console.log("Appwrite service :: deleteFile :: error ", error);
+
+      return false;
     }
   }
 
-  async getFilePreview(fileId) {
+  getFilePreview(fileId) {
     try {
-      return await this.bucket.getFileView({
+      return this.bucket.getFileView({
         bucketId: conf.appWriteBucketId,
         fileId,
       });
