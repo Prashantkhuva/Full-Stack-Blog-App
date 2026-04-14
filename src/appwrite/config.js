@@ -21,7 +21,7 @@ export class AppwriteService {
       return await this.database.createDocument({
         databaseId: conf.appWriteDatabaseId,
         collectionId: conf.appWriteCollectionId,
-        slug,
+        documentId: slug,
         data: {
           title,
           content,
