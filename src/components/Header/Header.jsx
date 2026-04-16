@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
 
@@ -47,12 +46,12 @@ function Header() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed top-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border"
+          className="fixed top-0 left-0 right-0 z-50 bg-transparent rounded-4xl backdrop-blur-md border-b border-border"
         >
           <Container>
             <nav className="flex items-center justify-between py-4">
               <Link to="/" className="group">
-                <Logo width="80px" />
+                <Logo width="50px" />
               </Link>
 
               <ul className="flex items-center space-x-1">
