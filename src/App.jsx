@@ -1,17 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import "./App.css";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import authService from "./appwrite/auth.js";
+import { login, logout } from "./store/authSlice";
+import { Header, Footer } from "./components/index.js";
+import { Outlet } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loading, setloading] = useState(true);
+  const dispatch = useDispatch();
 
-  return (
-    <>
-     <h1> Hello World!</h1>
-    </>
-  )
+  useEffect(() => {
+    authService
+      .getCurrentUser()
+      .then((userData) => {
+        if (userData) {
+          dispatch(
+            login({
+              userData: {
+                $id: userData.$id,
+                name: userData.name,
+                email: userData.email,
+              },
+            }),
+          );
+        } else {
+          dispatch(logout());
+        }
+      })
+      .finally(() => setloading(false));
+  }, []);
+
+  return !loading ? (
+    <div className="min-h-screen flex flex-col bg-bg">
+      <Header />
+      <main className="grow pt-20">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  ) : null;
 }
 
-export default App
+export default App;

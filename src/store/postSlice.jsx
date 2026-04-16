@@ -9,7 +9,7 @@ const postSlice = createSlice({
   name: "post",
   initialState,
   reducers: {
-    setPosts: (state, action) => {
+    setReduxPosts: (state, action) => {
       state.posts = action.payload; // initial fetch ke baad sab posts set karo
     },
     addPost: (state, action) => {
@@ -26,6 +26,6 @@ const postSlice = createSlice({
   },
 });
 
-export const { setPosts, addPost, updatePost, deletePost, setLoading } =
+export const { setReduxPosts, addPost, updatePost, deletePost, setLoading } =
   postSlice.actions;
 export default postSlice.reducer;

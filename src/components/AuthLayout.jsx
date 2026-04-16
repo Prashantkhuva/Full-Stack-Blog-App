@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
-function AuthLayout({ chiildren, authentication = true }) {
+function AuthLayout({ children, authentication = true }) {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(true);
 

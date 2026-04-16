@@ -7,35 +7,32 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   const navItem = [
-    {
-      name: "Home",
-      slug: "/",
-      active: true,
-    },
-    {
-      name: "Login",
-      slug: "/login",
-      active: !authStatus,
-    },
-    {
-      name: "Signup",
-      slug: "/signup",
-      active: !authStatus,
-    },
-    {
-      name: "All Posts",
-      slug: "/all-posts",
-      active: authStatus,
-    },
-    {
-      name: "Add Post",
-      slug: "/add-post",
-      active: authStatus,
-    },
+    { name: "Home", slug: "/", active: true },
+    { name: "Login", slug: "/login", active: !authStatus },
+    { name: "Signup", slug: "/signup", active: !authStatus },
+    { name: "All Posts", slug: "/all-posts", active: authStatus },
+    { name: "Add Post", slug: "/add-post", active: authStatus },
   ];
 
   return (
@@ -46,7 +43,7 @@ function Header() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed top-0 left-0 right-0 z-50 bg-transparent rounded-4xl backdrop-blur-md border-b border-border"
+          className="fixed top-0 left-10 right-10 z-50 bg-transparent backdrop-blur-md border-b border-border rounded-4xl"
         >
           <Container>
             <nav className="flex items-center justify-between py-4">
