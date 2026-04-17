@@ -203,7 +203,8 @@ function Home() {
                       ratio="aspect-square md:aspect-[16/9]"
                       fit="contain"
                       rounded="rounded-[24px] md:rounded-[28px]"
-                      loading="lazy"
+                      loading="eager"
+                      fetchPriority="high"
                       imageClassName="transition-transform duration-700 hover:scale-[1.02]"
                       overlay={
                         <div className="bg-linear-to-t from-bg/40 via-transparent to-transparent" />

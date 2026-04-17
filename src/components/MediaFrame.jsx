@@ -22,6 +22,7 @@ function MediaFrame({
   fallbackLabel = "No Image",
   fallbackHint = "Media unavailable",
   loading = "lazy",
+  fetchPriority = "auto",
 }) {
   const src = fileId ? appwriteService.getFilePreview(fileId) : null;
   // Support responsive ratio classes like "aspect-square md:aspect-[16/9]"
@@ -43,6 +44,7 @@ function MediaFrame({
           width={width}
           height={height}
           loading={loading}
+          fetchpriority={fetchPriority}
           className={`h-full w-full ${fitClass} ${imageClassName}`}
         />
       ) : (

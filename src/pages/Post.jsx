@@ -144,7 +144,8 @@ export default function Post() {
             ratio="aspect-[4/5] sm:aspect-[16/9]"
             fit="contain"
             rounded="rounded-none"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
             overlay={
               <div className="bg-linear-to-t from-bg via-bg/50 to-transparent" />
             }

@@ -68,12 +68,12 @@ function Header() {
             animate={{ y: 0 }}
             exit={{ y: -100 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed left-2 right-2 top-2 z-50 rounded-[24px] border border-border bg-bg/85 px-3 shadow-[0_16px_48px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:left-4 sm:right-4 md:left-6 md:right-6"
+            className="fixed left-2 right-2 top-2 z-50 rounded-3xl border border-border bg-bg/85 px-3 shadow-[0_16px_48px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:left-4 sm:right-4 md:left-6 md:right-6"
           >
             <Container>
               <nav className="flex items-center justify-between py-2.5 lg:py-4">
-                <Link to="/" className="group flex-shrink-0" onClick={() => setIsMenuOpen(false)}>
-                  <Logo width="44px" className="md:w-[50px]" />
+                <Link to="/" className="group shrink-0" onClick={() => setIsMenuOpen(false)}>
+                  <Logo width="44px" className="md:w-12.5" />
                 </Link>
 
                 <div className="hidden items-center gap-1 lg:flex">
@@ -129,7 +129,7 @@ function Header() {
                   <div className="mb-6 flex items-center justify-between">
                     <Link
                       to="/"
-                      className="group flex-shrink-0"
+                      className="group shrink-0"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Logo width="48px" />
