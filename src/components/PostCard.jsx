@@ -1,54 +1,82 @@
-import appwriteService from "../appwrite/config";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import {
+  formatPostDate,
+  getAuthorName,
+  getPostExcerpt,
+  getReadingTime,
+} from "../lib/post-utils";
+import { PostMeta } from "./blog/BlogUI";
+import MediaFrame from "./MediaFrame";
 
-function PostCard({ $id, title, featuredImage }) {
+function PostCard({
+  $id,
+  title,
+  featuredImage,
+  content,
+  $createdAt,
+  authorName,
+}) {
+  const excerpt = getPostExcerpt(content, 118);
+  const readingTime = getReadingTime(content);
+  const createdAt = formatPostDate($createdAt);
+  const byline = getAuthorName({ authorName });
+
   return (
-    <Link to={`/post/${$id}`}>
+    <Link to={`/post/${$id}`} className="block h-full">
       <motion.div
-        className="group relative bg-bg-card rounded-lg overflow-hidden border border-border cursor-pointer"
-        whileHover={{ y: -8, scale: 1.02 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-bg-card/90 shadow-[0_22px_60px_rgba(0,0,0,0.24)] cursor-pointer"
+        whileHover={{ y: -6, scale: 1.01 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: "-50px" }}
       >
-        <div className="relative aspect-16/10 overflow-hidden">
-          {featuredImage ? (
-            <img
-              src={appwriteService.getFilePreview(featuredImage)}
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            />
-          ) : (
-            <div className="w-full h-full bg-bg-secondary flex items-center justify-center">
-              <span className="text-text-muted text-4xl font-heading">
-                No Image
-              </span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-liner-to-t from-bg-card/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="border-b border-border/80">
+          <MediaFrame
+            fileId={featuredImage}
+            alt={title}
+            ratio="aspect-[16/9]"
+            fit="cover"
+            rounded="rounded-none"
+            loading="lazy"
+            imageClassName="transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            overlay={
+              <div className="bg-linear-to-b from-transparent via-transparent to-bg-card/80 opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+            }
+            fallbackLabel="Editorial"
+            fallbackHint="Story Preview"
+          />
+          <div className="absolute left-5 top-5 rounded-full border border-border bg-bg/75 px-3 py-2 backdrop-blur-sm transition-all duration-300 group-hover:border-accent/70">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-text/85">
+              {createdAt || "Premium Story"}
+            </span>
+          </div>
         </div>
 
-        <div className="p-5">
-          <motion.h2 className="font-heading text-xl md:text-2xl font-bold text-text leading-tight group-hover:text-accent transition-colors duration-300 line-clamp-2">
+        <div className="flex flex-1 flex-col gap-5 p-4 md:p-6">
+          <PostMeta
+            authorName={byline}
+            createdAt={createdAt}
+            readingTime={readingTime}
+          />
+
+          <motion.h2 className="line-clamp-2 font-heading text-2xl font-bold leading-tight text-text transition-colors duration-300 group-hover:text-accent md:text-[1.7rem]">
             {title}
           </motion.h2>
-          <div className="mt-4 flex items-center text-accent text-sm font-medium uppercase tracking-wider">
-            <span>Read Article</span>
-            <svg
-              className="w-4 h-4 ml-2 transform group-hover:translate-x-2 transition-transform duration-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
+
+          <p className="line-clamp-3 text-sm leading-7 text-text-muted md:text-base">
+            {excerpt}
+          </p>
+
+          <div className="mt-auto flex items-center justify-between border-t border-border/80 pt-4">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
+              Read Article
+            </span>
+            <div className="flex size-10 items-center justify-center rounded-full border border-border bg-bg-secondary text-accent transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-accent group-hover:bg-bg">
+              <ArrowUpRight size={16} />
+            </div>
           </div>
         </div>
       </motion.div>

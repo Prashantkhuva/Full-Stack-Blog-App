@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../store/authSlice";
 import { Button, Input, Logo } from "./index";
@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toPlainData } from "../lib/post-utils";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -14,9 +16,11 @@ function SignUp() {
   const { register, handleSubmit } = useForm();
 
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const create = async (data) => {
     setError("");
+    setIsSubmitting(true);
 
     try {
       const session = await authService.createAccount(data);
@@ -24,12 +28,22 @@ function SignUp() {
       if (session) {
         const userData = await authService.getCurrentUser();
 
-        if (userData) dispatch(authLogin(userData));
+        if (userData) {
+          const safeUserData = toPlainData({
+            $id: userData.$id,
+            name: userData.name,
+            email: userData.email,
+          });
+
+          dispatch(authLogin({ userData: safeUserData }));
+        }
 
         navigate("/");
       }
     } catch (error) {
       setError(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -50,7 +64,7 @@ function SignUp() {
         initial="hidden"
         animate="visible"
       >
-        <div className="bg-bg-card border border-border rounded-2xl p-8 md:p-10 shadow-2xl">
+        <div className="bg-bg-card border border-border rounded-2xl p-6 shadow-2xl md:p-10">
           <div className="mb-6 flex justify-center">
             <Logo width="120px" />
           </div>
@@ -122,9 +136,16 @@ function SignUp() {
             <motion.div whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-accent hover:bg-accent-hover text-bg font-semibold"
               >
-                Create Account
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <Skeleton className="h-4 w-32 bg-bg/30" />
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </motion.div>
           </form>

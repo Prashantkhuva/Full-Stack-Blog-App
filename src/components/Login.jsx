@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../store/authSlice";
 import { Button, Input, Logo } from "./index";
@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toPlainData } from "../lib/post-utils";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,9 +16,11 @@ function Login() {
   const { register, handleSubmit } = useForm();
 
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const login = async (data) => {
     setError("");
+    setIsSubmitting(true);
 
     try {
       const session = await authService.login(data);
@@ -24,13 +28,22 @@ function Login() {
       if (session) {
         const userData = await authService.getCurrentUser();
 
-        if (userData) dispatch(authLogin(userData));
+        if (userData) {
+          const safeUserData = toPlainData({
+            $id: userData.$id,
+            name: userData.name,
+            email: userData.email,
+          });
+
+          dispatch(authLogin({ userData: safeUserData }));
+        }
 
         navigate("/");
       }
     } catch (error) {
       setError(error.message);
-      ("");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -44,14 +57,14 @@ function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center w-full px-4">
+    <div className="min-h-[80vh] flex items-center justify-center w-full px-4 py-8">
       <motion.div
         className="mx-auto w-full max-w-md"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="bg-bg-card border border-border rounded-2xl p-8 md:p-10 shadow-2xl">
+        <div className="bg-bg-card border border-border rounded-2xl p-6 shadow-2xl md:p-10">
           <div className="mb-6 flex justify-center">
             <Logo width="120px" />
           </div>
@@ -114,9 +127,16 @@ function Login() {
             <motion.div whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-accent hover:bg-accent-hover text-bg font-semibold"
               >
-                Sign In
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <Skeleton className="h-4 w-24 bg-bg/30" />
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </motion.div>
           </form>

@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AuthFormSkeleton } from "./loading/LoadingSkeletons";
 
 function AuthLayout({ children, authentication = true }) {
   const navigate = useNavigate();
-  const [loader, setLoader] = useState(true);
-
   const authStatus = useSelector((state) => state.auth.status);
+  const isAuthorizedRoute = authentication ? authStatus : !authStatus;
 
   useEffect(() => {
     if (authentication && authStatus !== authentication) {
@@ -15,24 +14,9 @@ function AuthLayout({ children, authentication = true }) {
     } else if (!authentication && authStatus !== authentication) {
       navigate("/");
     }
-
-    setLoader(false);
   }, [authStatus, navigate, authentication]);
 
-  return loader ? (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <motion.div
-        className="text-accent font-heading text-2xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        Loading...
-      </motion.div>
-    </div>
-  ) : (
-    <>{children}</>
-  );
+  return isAuthorizedRoute ? <>{children}</> : <AuthFormSkeleton />;
 }
 
 export default AuthLayout;

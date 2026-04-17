@@ -1,11 +1,12 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Input, Button, Select, RTE } from "../index";
+import { Input, Button, Select, RTE, MediaFrame } from "../index";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { motion } from "framer-motion";
-import { updatePost, deletePost, addPost } from "../../store/postSlice";
+import { updatePost, addPost } from "../../store/postSlice";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toPlainData } from "../../lib/post-utils";
 
 function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } =
@@ -24,41 +25,60 @@ function PostForm({ post }) {
   const dispatch = useDispatch();
 
   const userData = useSelector((state) => state.auth.userData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submit = async (data) => {
-    if (post) {
-      const file = data.image[0]
-        ? await appwriteService.uplaoadFile(data.image[0])
-        : null;
+    setIsSubmitting(true);
 
-      if (file) {
-        appwriteService.deleteFile(post.featuredImage);
+    try {
+      if (!post && !userData?.$id) {
+        throw new Error("Please sign in again before creating a post.");
       }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
+      if (post) {
+        const file = data.image[0]
+          ? await appwriteService.uplaoadFile(data.image[0])
+          : null;
 
-      dispatch(updatePost(dbPost));
-      if (dbPost) navigate(`/post/${dbPost.$id}`);
-    } else {
-      const file = data.image[0]
-        ? await appwriteService.uplaoadFile(data.image[0])
-        : null;
+        if (file) {
+          appwriteService.deleteFile(post.featuredImage);
+        }
 
-      if (file) {
-        const fileId = file.$id;
-        data.featuredImage = fileId;
-
-        const dbPost = await appwriteService.createPost({
+        const dbPost = await appwriteService.updatePost(post.$id, {
           ...data,
-          userId: userData.$id,
+          featuredImage: file ? file.$id : undefined,
         });
 
-        dispatch(addPost(dbPost));
-        if (dbPost) navigate(`/post/${dbPost.$id}`);
+        const plainPost = dbPost ? toPlainData(dbPost) : null;
+
+        if (plainPost) {
+          dispatch(updatePost(plainPost));
+        }
+        if (plainPost) navigate(`/post/${plainPost.$id}`);
+      } else {
+        const file = data.image[0]
+          ? await appwriteService.uplaoadFile(data.image[0])
+          : null;
+
+        if (file) {
+          const fileId = file.$id;
+          data.featuredImage = fileId;
+
+          const dbPost = await appwriteService.createPost({
+            ...data,
+            userId: userData.$id,
+          });
+
+          const plainPost = dbPost ? toPlainData(dbPost) : null;
+
+          if (plainPost) {
+            dispatch(addPost(plainPost));
+            navigate(`/post/${plainPost.$id}`);
+          }
+        }
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -69,9 +89,9 @@ function PostForm({ post }) {
         .toLowerCase()
         .replace(/[^a-zA-Z\d\s]+/g, "-")
         .replace(/\s/g, "-");
-
-      return "";
     }
+
+    return "";
   }, []);
 
   useEffect(() => {
@@ -92,10 +112,10 @@ function PostForm({ post }) {
   return (
     <form
       onSubmit={handleSubmit(submit)}
-      className="bg-bg-card border border-border rounded-xl p-6 md:p-8"
+      className="rounded-[28px] border border-border bg-bg-card p-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] md:p-8"
     >
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-5">
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="space-y-5 md:col-span-2">
           <Input
             label="Title"
             placeholder="Enter post title"
@@ -128,23 +148,28 @@ function PostForm({ post }) {
           />
 
           {post && post.featuredImage && (
-            <div className="rounded-lg overflow-hidden border border-border">
-              <img
-                src={appwriteService.getFilePreview(post.featuredImage)}
-                alt={post.title}
-                className="w-full h-auto"
-              />
-            </div>
+            <MediaFrame
+              fileId={post.featuredImage}
+              alt={post.title}
+              ratio="aspect-[4/3]"
+              fit="contain"
+              rounded="rounded-2xl"
+              loading="lazy"
+              fallbackLabel="Preview"
+              fallbackHint="Featured Image"
+            />
           )}
 
           <Select
             options={["active", "inactive"]}
             label="Status"
+            className="w-full"
             {...register("status", { required: true })}
           />
 
           <Button
             type="submit"
+            disabled={isSubmitting}
             bgColor={
               post
                 ? "bg-emerald-600 hover:bg-emerald-700"
@@ -152,7 +177,15 @@ function PostForm({ post }) {
             }
             className="w-full"
           >
-            {post ? "Update Post" : "Publish Post"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <Skeleton className="h-4 w-28 bg-bg/30" />
+              </span>
+            ) : post ? (
+              "Update Post"
+            ) : (
+              "Publish Post"
+            )}
           </Button>
         </div>
       </div>
