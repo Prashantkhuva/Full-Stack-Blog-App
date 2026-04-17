@@ -37,11 +37,11 @@ function PostCard({
           <MediaFrame
             fileId={featuredImage}
             alt={title}
-            ratio="aspect-[16/9]"
+            ratio="aspect-[16/10]"
             fit="cover"
             rounded="rounded-none"
             loading="lazy"
-            imageClassName="transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            imageClassName="transition-transform duration-500 group-hover:scale-105"
             overlay={
               <div className="bg-linear-to-b from-transparent via-transparent to-bg-card/80 opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
             }
