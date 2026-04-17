@@ -7,31 +7,45 @@ export default function Toast({ message, type = "error", onClose }) {
     if (message) {
       const timer = setTimeout(() => {
         onClose();
-      }, 3500); // Auto dismiss after 3.5s
+      }, 3500); 
       return () => clearTimeout(timer);
     }
   }, [message, onClose]);
+
+  const isError = type === "error";
 
   return (
     <AnimatePresence>
       {message && (
         <motion.div
-          initial={{ x: "100%", opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: "100%", opacity: 0 }}
+          initial={{ y: 50, x: "-50%", opacity: 0 }}
+          animate={{ y: 0, x: "-50%", opacity: 1 }}
+          exit={{ y: 50, x: "-50%", opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className={`fixed bottom-5 right-5 z-100 flex w-full max-w-sm items-center gap-3 rounded-2xl px-4 py-3 shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-md ${
-            type === "error"
-              ? "border border-red-500/30 bg-red-950/90 text-red-100"
-              : "border border-emerald-500/30 bg-emerald-950/90 text-emerald-100"
+          className={`fixed bottom-5 left-1/2 z-50 flex w-[90%] max-w-sm items-center gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md ${
+            isError
+              ? "border-red-500/20 bg-red-500/10"
+              : "border-green-500/20 bg-green-500/10"
           }`}
         >
-          {type === "error" ? (
-            <XCircle className="size-5 shrink-0 text-red-500" />
-          ) : (
-            <CheckCircle className="size-5 shrink-0 text-emerald-500" />
-          )}
-          <p className="text-sm font-medium">{message}</p>
+          <div
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+              isError ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
+            }`}
+          >
+            {isError ? (
+              <XCircle size={18} />
+            ) : (
+              <CheckCircle size={18} />
+            )}
+          </div>
+          <p
+            className={`text-sm font-medium ${
+              isError ? "text-red-300" : "text-green-300"
+            }`}
+          >
+            {message}
+          </p>
         </motion.div>
       )}
     </AnimatePresence>
