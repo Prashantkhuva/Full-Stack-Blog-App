@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import authService from "./appwrite/auth.js";
 import { login, logout } from "./store/authSlice";
-import { Header, Footer } from "./components/index.js";
+import { AppShellSkeleton, Header, Footer } from "./components/index.js";
 import { Outlet } from "react-router-dom";
 
 function App() {
-  const [loading, setloading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -28,10 +28,14 @@ function App() {
           dispatch(logout());
         }
       })
-      .finally(() => setloading(false));
-  }, []);
+      .finally(() => setLoading(false));
+  }, [dispatch]);
 
-  return !loading ? (
+  if (loading) {
+    return <AppShellSkeleton />;
+  }
+
+  return (
     <div className="min-h-screen flex flex-col bg-bg">
       <Header />
       <main className="grow pt-20">
@@ -39,7 +43,7 @@ function App() {
       </main>
       <Footer />
     </div>
-  ) : null;
+  );
 }
 
 export default App;
