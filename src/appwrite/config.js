@@ -40,7 +40,7 @@ export class AppwriteService {
       return await this.database.updateDocument({
         databaseId: conf.appWriteDatabaseId,
         collectionId: conf.appWriteCollectionId,
-        slug,
+        documentId: slug,
         data: {
           title,
           content,
@@ -58,7 +58,7 @@ export class AppwriteService {
       await this.database.deleteDocument({
         databaseId: conf.appWriteDatabaseId,
         collectionId: conf.appWriteCollectionId,
-        slug,
+        documentId: slug,
       });
 
       return true;

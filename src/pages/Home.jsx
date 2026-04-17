@@ -20,6 +20,7 @@ import {
   getReadingTime,
   toPlainData,
 } from "../lib/post-utils";
+import { updateMetaTags, generateBreadcrumbSchema, injectSchema, clearInjectedSchemas } from "../lib/seo-utils";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -64,6 +65,27 @@ function Home() {
     };
   }, [authStatus]);
 
+  // SEO: Update meta tags on homepage load
+  useEffect(() => {
+    const baseUrl = window.location.origin;
+    updateMetaTags({
+      title: 'MegaBlog – Modern SaaS Blog Platform',
+      description: 'MegaBlog is a modern SaaS-style blog platform built with React. Read, write, and share stories with a clean and premium experience.',
+      url: baseUrl,
+    });
+
+    // Inject Breadcrumb schema for homepage
+    clearInjectedSchemas();
+    const breadcrumbSchema = generateBreadcrumbSchema([
+      { name: 'Home', url: baseUrl },
+    ]);
+    injectSchema(breadcrumbSchema);
+
+    return () => {
+      clearInjectedSchemas();
+    };
+  }, []);
+
   const featuredPost = posts[0];
   const regularPosts = posts.slice(1);
   const featuredExcerpt = featuredPost
@@ -102,7 +124,7 @@ function Home() {
     <div className="w-full">
       {/* Hero Section */}
       {featuredPost && (
-        <section className="relative overflow-hidden px-4 py-12 md:px-6 md:py-24">
+        <section className="relative overflow-hidden px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
           <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-bg-secondary/50 via-bg-secondary/20 to-bg" />
           <Container>
             <motion.div
@@ -111,8 +133,8 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] md:gap-10">
-                <div className="order-2 flex flex-col gap-4 md:order-1 md:gap-6">
+              <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] md:gap-10">
+                <div className="order-2 flex flex-col items-center gap-6 text-center md:order-1 md:items-start md:text-left">
                   <motion.span
                     className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/80"
                     initial={{ opacity: 0, y: 16 }}
@@ -122,7 +144,7 @@ function Home() {
                     Featured Story
                   </motion.span>
                   <motion.h1
-                    className="font-heading text-3xl font-bold leading-[1.05] text-text md:text-6xl"
+                    className="font-heading text-2xl font-bold leading-[1.1] text-text md:text-6xl"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
@@ -155,20 +177,20 @@ function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
                   >
-                    <Link to={`/post/${featuredPost.$id}`}>
-                      <Button className="w-full sm:w-auto bg-accent text-bg hover:bg-accent-hover">
+                    <Link to={`/post/${featuredPost.$id}`} className="w-full sm:w-auto">
+                      <Button className="w-full bg-accent text-bg hover:bg-accent-hover">
                         Read Article
                       </Button>
                     </Link>
                     <Link
                       to="/all-posts"
-                      className="inline-flex items-center justify-center rounded-full border border-border bg-bg-card/60 px-5 py-3 text-sm font-semibold uppercase tracking-[0.24em] text-text transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                      className="inline-flex w-full items-center justify-center rounded-full border border-border bg-bg-card/60 px-5 py-3 text-sm font-semibold uppercase tracking-[0.24em] text-text transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:text-accent sm:w-auto"
                     >
                       Browse Archive
                     </Link>
                   </motion.div>
                 </div>
-                <div className="order-1 md:order-2">
+                <div className="order-1 mx-auto w-full max-w-sm md:order-2 md:max-w-none">
                   <motion.div
                     className="relative shadow-[0_28px_80px_rgba(0,0,0,0.3)]"
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -178,9 +200,9 @@ function Home() {
                     <MediaFrame
                       fileId={featuredPost.featuredImage}
                       alt={featuredPost.title}
-                      ratio="aspect-[16/9]"
+                      ratio="aspect-square md:aspect-[16/9]"
                       fit="contain"
-                      rounded="rounded-[28px]"
+                      rounded="rounded-[24px] md:rounded-[28px]"
                       loading="lazy"
                       imageClassName="transition-transform duration-700 hover:scale-[1.02]"
                       overlay={
@@ -199,7 +221,7 @@ function Home() {
 
       {/* Posts Grid */}
       {regularPosts.length > 0 && (
-        <section className="px-4 py-12 md:px-6 md:py-20">
+        <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-20">
           <Container>
             <motion.div
               className="mb-8 md:mb-12"

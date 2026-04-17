@@ -1,0 +1,15 @@
+# MegaBlog Robots.txt
+# Allow all crawlers
+
+User-agent: *
+Allow: /
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://mega-blog-prashantkhuvas-projects.vercel.app/sitemap.xml
+
+# Disallow admin/private paths (if any)
+Disallow: /api/
+Disallow: /admin/

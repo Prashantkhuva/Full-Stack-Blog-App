@@ -13,6 +13,13 @@ import parse from "html-react-parser";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { formatPostDate, getAuthorName, getReadingTime } from "../lib/post-utils";
+import {
+  updateMetaTags,
+  generateBlogPostingSchema,
+  generateBreadcrumbSchema,
+  injectSchema,
+  clearInjectedSchemas,
+} from "../lib/seo-utils";
 
 export default function Post() {
   const [post, setPost] = useState(null);
@@ -60,6 +67,39 @@ export default function Post() {
     };
   }, [slug, navigate]);
 
+  // Update SEO meta tags when post loads
+  useEffect(() => {
+    if (post) {
+      const excerpt = post.content?.substring(0, 160).replace(/<[^>]*>/g, '').trim() + '...';
+      const postUrl = `${window.location.origin}/post/${post.$id}`;
+
+      updateMetaTags({
+        title: `${post.title} | MegaBlog`,
+        description: excerpt,
+        image: post.featuredImage || `${window.location.origin}/og-image.png`,
+        url: postUrl,
+        type: 'article',
+      });
+
+      // Inject BlogPosting schema
+      clearInjectedSchemas();
+      const blogSchema = generateBlogPostingSchema(post);
+      injectSchema(blogSchema);
+
+      // Inject Breadcrumb schema
+      const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: 'Home', url: window.location.origin },
+        { name: 'All Posts', url: `${window.location.origin}/all-posts` },
+        { name: post.title, url: postUrl },
+      ]);
+      injectSchema(breadcrumbSchema);
+    }
+
+    return () => {
+      clearInjectedSchemas();
+    };
+  }, [post]);
+
   const deletePost = () => {
     appwriteService.deletePost(post.$id).then((status) => {
       if (status) {
@@ -101,21 +141,21 @@ export default function Post() {
           <MediaFrame
             fileId={post.featuredImage}
             alt={post.title}
-            ratio="aspect-[16/9]"
+            ratio="aspect-[4/5] sm:aspect-[16/9]"
             fit="contain"
             rounded="rounded-none"
             loading="lazy"
             overlay={
               <div className="bg-linear-to-t from-bg via-bg/50 to-transparent" />
             }
-            fallbackLabel="Article"
+            fallbackLabel="Articl"
             fallbackHint="Featured Media"
             className="border-0"
           />
 
           {/* Author Actions */}
           {isAuthor && (
-            <div className="absolute right-4 top-4 z-20 md:right-6 md:top-6">
+            <div className="absolute right-3 top-3 z-20 md:right-6 md:top-6">
               <PostActionButtons
                 editTo={`/edit-post/${post.$id}`}
                 onDelete={deletePost}
@@ -128,12 +168,12 @@ export default function Post() {
       {/* Content */}
       <Container>
         <motion.div
-          className="relative z-10 mx-auto -mt-12 max-w-4xl px-4 md:-mt-16 md:px-0"
+          className="relative z-10 mx-auto -mt-8 max-w-4xl px-4 sm:-mt-12 md:-mt-16 md:px-0"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="rounded-[32px] border border-border bg-bg-card px-4 py-6 shadow-[0_28px_80px_rgba(0,0,0,0.28)] md:px-10 md:py-12">
+          <div className="rounded-3xl border border-border bg-bg-card px-4 py-6 shadow-[0_28px_80px_rgba(0,0,0,0.28)] sm:px-6 sm:py-8 md:rounded-4xl md:px-10 md:py-12">
             <div className="mx-auto flex w-full max-w-3xl flex-col">
               <motion.div
                 className="mb-5"
@@ -141,7 +181,7 @@ export default function Post() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.26 }}
               >
-                <span className="mb-4 inline-flex rounded-full border border-border bg-bg-secondary px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-accent/80">
+                <span className="mb-4 inline-flex rounded-full border border-border bg-bg-secondary px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-accent/80 md:px-4 md:py-2 md:text-[11px]">
                   Editorial Note
                 </span>
                 <PostMeta
@@ -152,7 +192,7 @@ export default function Post() {
                 />
               </motion.div>
               <motion.h1
-                className="mb-6 max-w-4xl font-heading text-2xl font-bold leading-[1.08] text-text md:mb-8 md:text-5xl"
+                className="mb-6 max-w-4xl font-heading text-xl font-bold leading-[1.1] text-text md:mb-8 md:text-5xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
@@ -166,7 +206,7 @@ export default function Post() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                {parse(post.content)}
+                {parse((post.content || "").replace(/&nbsp;/g, " "))}
               </motion.div>
             </div>
           </div>

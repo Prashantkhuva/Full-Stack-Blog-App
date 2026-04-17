@@ -3,11 +3,83 @@
   <head>
     <meta charset="UTF-8" />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
+    <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
 
-    <title>blog-app</title>
+    <!-- Primary Meta Tags -->
+    <title>MegaBlog – Modern SaaS Blog Platform</title>
+    <meta name="title" content="MegaBlog – Modern SaaS Blog Platform" />
+    <meta name="description" content="MegaBlog is a modern SaaS-style blog platform built with React. Read, write, and share stories with a clean and premium experience." />
+    <meta name="keywords" content="blog, SaaS blog, React blog, MegaBlog, developer blog, tech blog, modern blogging platform" />
+    <meta name="author" content="Prashant" />
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- Canonical URL (updated dynamically per page) -->
+    <link rel="canonical" href="https://mega-blog-prashantkhuvas-projects.vercel.app/" id="canonical-link" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mega-blog-prashantkhuvas-projects.vercel.app" />
+    <meta property="og:title" content="MegaBlog – Modern SaaS Blog Platform" />
+    <meta property="og:description" content="MegaBlog is a modern SaaS-style blog platform built with React. Read, write, and share stories with a clean and premium experience." />
+    <meta property="og:image" content="https://mega-blog-prashantkhuvas-projects.vercel.app/og-image.png" />
+    <meta property="og:site_name" content="MegaBlog" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://mega-blog-prashantkhuvas-projects.vercel.app" />
+    <meta name="twitter:title" content="MegaBlog – Modern SaaS Blog Platform" />
+    <meta name="twitter:description" content="MegaBlog is a modern SaaS-style blog platform built with React. Read, write, and share stories with a clean and premium experience." />
+    <meta name="twitter:image" content="https://mega-blog-prashantkhuvas-projects.vercel.app/og-image.png" />
+    <meta name="twitter:creator" content="@prashantkhuva_" />
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- JSON-LD Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MegaBlog",
+      "url": "https://mega-blog-prashantkhuvas-projects.vercel.app/",
+      "logo": "https://mega-blog-prashantkhuvas-projects.vercel.app/favicon.svg",
+      "description": "MegaBlog is a modern SaaS-style blog platform built with React.",
+      "founder": {
+        "@type": "Person",
+        "name": "Prashant"
+      },
+      "sameAs": [
+        "https://github.com/Prashantkhuva",
+        "https://linkedin.com/prashantkhuva",
+        "https://x.com/prashantkhuva_"
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD WebSite Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MegaBlog",
+      "url": "https://mega-blog-prashantkhuvas-projects.vercel.app/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://mega-blog-prashantkhuvas-projects.vercel.app/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body>
     <div class="font-display bg-black h-screen text-white" id="root"></div>

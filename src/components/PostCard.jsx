@@ -26,8 +26,8 @@ function PostCard({
   return (
     <Link to={`/post/${$id}`} className="block h-full">
       <motion.div
-        className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-bg-card/90 shadow-[0_22px_60px_rgba(0,0,0,0.24)] cursor-pointer"
-        whileHover={{ y: -6, scale: 1.01 }}
+        className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-bg-card/90 shadow-[0_22px_60px_rgba(0,0,0,0.24)] cursor-pointer md:rounded-[28px]"
+        whileHover={{ y: -4, scale: 1.01 }}
         transition={{ duration: 0.28, ease: "easeOut" }}
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
@@ -37,7 +37,7 @@ function PostCard({
           <MediaFrame
             fileId={featuredImage}
             alt={title}
-            ratio="aspect-[16/10]"
+            ratio="aspect-[4/5] sm:aspect-[16/10]"
             fit="cover"
             rounded="rounded-none"
             loading="lazy"
@@ -48,21 +48,21 @@ function PostCard({
             fallbackLabel="Editorial"
             fallbackHint="Story Preview"
           />
-          <div className="absolute left-5 top-5 rounded-full border border-border bg-bg/75 px-3 py-2 backdrop-blur-sm transition-all duration-300 group-hover:border-accent/70">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-text/85">
+          <div className="absolute left-3 top-3 rounded-full border border-border bg-bg/75 px-2.5 py-1.5 backdrop-blur-sm transition-all duration-300 group-hover:border-accent/70 md:left-5 md:top-5 md:px-3 md:py-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-text/85 md:text-[11px]">
               {createdAt || "Premium Story"}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-5 p-4 md:p-6">
+        <div className="flex flex-1 flex-col gap-3 p-4 sm:gap-4 md:gap-5 md:p-6">
           <PostMeta
             authorName={byline}
             createdAt={createdAt}
             readingTime={readingTime}
           />
 
-          <motion.h2 className="line-clamp-2 font-heading text-2xl font-bold leading-tight text-text transition-colors duration-300 group-hover:text-accent md:text-[1.7rem]">
+          <motion.h2 className="line-clamp-2 font-heading text-lg font-bold leading-tight text-text transition-colors duration-300 group-hover:text-accent md:text-[1.7rem]">
             {title}
           </motion.h2>
 
@@ -74,8 +74,8 @@ function PostCard({
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
               Read Article
             </span>
-            <div className="flex size-10 items-center justify-center rounded-full border border-border bg-bg-secondary text-accent transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-accent group-hover:bg-bg">
-              <ArrowUpRight size={16} />
+            <div className="flex size-9 items-center justify-center rounded-full border border-border bg-bg-secondary text-accent transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-accent group-hover:bg-bg md:size-10">
+              <ArrowUpRight size={14} />
             </div>
           </div>
         </div>

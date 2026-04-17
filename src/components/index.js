@@ -24,6 +24,7 @@ import {
 } from "./loading/LoadingSkeletons";
 import { EmptyState, PostMeta, SectionHeading } from "./blog/BlogUI";
 import { ActionIconButton, PostActionButtons } from "./blog/PostActionButtons";
+import Toast from "./Toast";
 
 export {
   Container,
@@ -53,4 +54,5 @@ export {
   SectionHeading,
   ActionIconButton,
   PostActionButtons,
+  Toast,
 };

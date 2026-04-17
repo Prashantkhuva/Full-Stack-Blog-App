@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>https://mega-blog-prashantkhuvas-projects.vercel.app/</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- All Posts Archive -->
+  <url>
+    <loc>https://mega-blog-prashantkhuvas-projects.vercel.app/all-posts</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Login Page -->
+  <url>
+    <loc>https://mega-blog-prashantkhuvas-projects.vercel.app/login</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Signup Page -->
+  <url>
+    <loc>https://mega-blog-prashantkhuvas-projects.vercel.app/signup</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Note: Individual post URLs should be dynamically generated -->
+  <!-- Add post URLs like: -->
+  <!--
+  <url>
+    <loc>https://mega-blog-prashantkhuvas-projects.vercel.app/post/post-slug</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  -->
+</urlset>

@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setReduxPosts } from "../store/postSlice";
 import { toPlainData } from "../lib/post-utils";
+import { updateMetaTags, generateBreadcrumbSchema, injectSchema, clearInjectedSchemas } from "../lib/seo-utils";
 
 function AllPosts() {
   const [posts, setPosts] = useState([]);
@@ -44,6 +45,28 @@ function AllPosts() {
     };
   }, [dispatch, authStatus]);
 
+  // SEO: Update meta tags for All Posts page
+  useEffect(() => {
+    const baseUrl = window.location.origin;
+    updateMetaTags({
+      title: 'All Posts – MegaBlog',
+      description: `Browse all ${posts.length} ${posts.length === 1 ? 'story' : 'stories'} on MegaBlog. A curated collection of articles on technology, development, and more.`,
+      url: `${baseUrl}/all-posts`,
+    });
+
+    // Inject Breadcrumb schema
+    clearInjectedSchemas();
+    const breadcrumbSchema = generateBreadcrumbSchema([
+      { name: 'Home', url: baseUrl },
+      { name: 'All Posts', url: `${baseUrl}/all-posts` },
+    ]);
+    injectSchema(breadcrumbSchema);
+
+    return () => {
+      clearInjectedSchemas();
+    };
+  }, [posts.length]);
+
   const staggerContainer = {
     animate: {
       transition: {
@@ -64,7 +87,7 @@ function AllPosts() {
 
   return (
     <motion.div
-      className="w-full px-4 py-12 md:px-6 md:py-14"
+      className="w-full px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -96,7 +119,7 @@ function AllPosts() {
             />
           ) : (
             <motion.div
-              className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+              className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3"
               variants={staggerContainer}
               initial="initial"
               animate="animate"

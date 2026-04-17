@@ -78,34 +78,55 @@ function Footer() {
   ];
 
   return (
-    <footer className="border-t border-neutral-800 mt-16">
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Branding */}
-        <div className="text-center space-y-3">
-          <h2 className="text-xl font-semibold">MegaBlog.</h2>
-          <p className="text-neutral-400">Stories worth sharing.</p>
-          <p className="text-sm text-neutral-500">
-            Crafted with code & creativity by Prashant
-          </p>
-        </div>
+    <footer className="mt-16 border-t border-neutral-800">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+        {/* Grid layout */}
+        <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-3">
+          {/* Branding */}
+          <div className="flex flex-col items-center gap-2 sm:items-start">
+            <h2 className="text-xl font-semibold">MegaBlog.</h2>
+            <p className="text-neutral-400">Stories worth sharing.</p>
+            <p className="text-sm text-neutral-500">
+              Crafted with code & creativity by Prashant
+            </p>
+          </div>
 
-        {/* Social Icons */}
-        <div className="flex items-center justify-center gap-4 mt-6">
-          {socialLinks.map((item, i) => (
-            <a
-              key={i}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-700 hover:border-amber-500 hover:text-amber-500 transition"
-            >
-              {item.icon}
-            </a>
-          ))}
+          {/* Quick Links placeholder — keeps grid balanced */}
+          <div className="flex flex-col items-center gap-2 sm:items-start">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-400">
+              Explore
+            </h3>
+            <nav className="flex flex-col gap-1.5 text-sm text-neutral-500">
+              <a href="/" className="transition-colors duration-300 hover:text-amber-500">Home</a>
+              <a href="/all-posts" className="transition-colors duration-300 hover:text-amber-500">All Posts</a>
+              <a href="/add-post" className="transition-colors duration-300 hover:text-amber-500">Write a Story</a>
+            </nav>
+          </div>
+
+          {/* Social Icons */}
+          <div className="flex flex-col items-center gap-3 sm:items-start lg:items-end">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-400">
+              Connect
+            </h3>
+            <div className="flex items-center justify-center gap-4 sm:gap-5">
+              {socialLinks.map((item, i) => (
+                <a
+                  key={i}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.label}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 transition-all duration-300 hover:border-amber-500 hover:text-amber-500 sm:h-12 sm:w-12"
+                >
+                  {item.icon}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Bottom */}
-        <div className="text-center text-sm text-neutral-500 mt-10">
+        <div className="mt-8 border-t border-neutral-800 pt-6 text-center text-sm text-neutral-500 sm:mt-10">
           © 2026 MegaBlog. All rights reserved.
         </div>
       </div>

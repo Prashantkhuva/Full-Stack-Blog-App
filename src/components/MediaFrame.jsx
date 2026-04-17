@@ -2,7 +2,11 @@ import appwriteService from "../appwrite/config";
 
 const ratioDimensions = {
   "aspect-[16/11]": { width: 1600, height: 1100 },
+  "aspect-[16/9]": { width: 1600, height: 900 },
+  "aspect-[16/10]": { width: 1600, height: 1000 },
   "aspect-[4/3]": { width: 1200, height: 900 },
+  "aspect-[4/5]": { width: 800, height: 1000 },
+  "aspect-square": { width: 1000, height: 1000 },
   "aspect-[21/8]": { width: 2100, height: 800 },
 };
 
@@ -20,10 +24,12 @@ function MediaFrame({
   loading = "lazy",
 }) {
   const src = fileId ? appwriteService.getFilePreview(fileId) : null;
-  const { width, height } = ratioDimensions[ratio] || ratioDimensions["aspect-[4/3]"];
+  // Support responsive ratio classes like "aspect-square md:aspect-[16/9]"
+  const baseRatio = ratio.split(" ")[0];
+  const { width, height } = ratioDimensions[baseRatio] || ratioDimensions["aspect-[4/3]"];
   const fitClass =
     fit === "contain"
-      ? "object-contain p-4 md:p-8"
+      ? "object-contain p-3 sm:p-4 md:p-8 mx-auto max-w-full"
       : "object-cover";
 
   return (

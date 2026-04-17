@@ -1,14 +1,22 @@
+function cleanText(text = "") {
+  if (!text) return "";
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function stripHtml(html = "") {
   if (!html) {
     return "";
   }
 
-  return html
+  const textWithoutTags = html
     .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, " ")
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/<[^>]+>/g, " ");
+
+  return cleanText(textWithoutTags);
 }
 
 function toPlainData(value) {
@@ -74,6 +82,7 @@ function getAuthorName(post, fallback = "MegaBlog Editorial") {
 }
 
 export {
+  cleanText,
   formatPostDate,
   getAuthorName,
   getPostExcerpt,
