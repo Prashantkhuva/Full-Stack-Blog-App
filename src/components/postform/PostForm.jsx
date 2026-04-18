@@ -84,8 +84,11 @@ function PostForm({ post }) {
 
         if (plainPost) {
           dispatch(updatePost(plainPost));
+          showToast("Post updated successfully", "success");
+          setTimeout(() => {
+            navigate(`/post/${plainPost.$id}`);
+          }, 2200);
         }
-        if (plainPost) navigate(`/post/${plainPost.$id}`);
       } else {
         const file = data.image[0]
           ? await appwriteService.uplaoadFile(data.image[0])
@@ -108,7 +111,7 @@ function PostForm({ post }) {
             // Delay navigation slightly so user sees success toast
             setTimeout(() => {
               navigate(`/post/${plainPost.$id}`);
-            }, 1500);
+            }, 3500);
           }
         }
       }

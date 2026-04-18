@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { XCircle, CheckCircle } from "lucide-react";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Toast({ message, type = "error", onClose }) {
   useEffect(() => {
@@ -29,14 +29,24 @@ export default function Toast({ message, type = "error", onClose }) {
           }`}
         >
           <div
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
               isError ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
             }`}
           >
             {isError ? (
-              <XCircle size={18} />
+              <DotLottieReact
+                src="https://lottie.host/8044c951-e3ed-44ba-a62f-d61cb7c47255/tsREtHLGyq.lottie"
+                autoplay
+                loop={false}
+                className="w-8 h-8"
+              />
             ) : (
-              <CheckCircle size={18} />
+              <DotLottieReact
+                src="https://lottie.host/b610cf69-d5d4-45a3-b07f-e0d4224bc299/yFSp052FbS.lottie"
+                autoplay
+                loop={false}
+                className="w-8 h-8"
+              />
             )}
           </div>
           <p

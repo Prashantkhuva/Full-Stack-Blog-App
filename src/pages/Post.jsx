@@ -8,6 +8,7 @@ import {
   PostDetailsSkeleton,
   PostMeta,
   PostActionButtons,
+  Toast,
 } from "../components";
 import parse from "html-react-parser";
 import { useSelector } from "react-redux";
@@ -26,6 +27,11 @@ export default function Post() {
   const [loading, setLoading] = useState(true);
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [toastConfig, setToastConfig] = useState({ show: false, message: "", type: "error" });
+
+  const showToast = (message, type = "error") => {
+    setToastConfig({ show: true, message, type });
+  };
 
   const userData = useSelector((state) => state.auth.userData);
 
@@ -104,7 +110,10 @@ export default function Post() {
     appwriteService.deletePost(post.$id).then((status) => {
       if (status) {
         appwriteService.deleteFile(post.featuredImage);
-        navigate("/");
+        showToast("Post deleted successfully", "success");
+        setTimeout(() => {
+          navigate("/");
+        }, 2200);
       }
     });
   };
@@ -129,12 +138,18 @@ export default function Post() {
   }
 
   return (
-    <motion.article
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="pb-16 md:pb-24"
-    >
+    <>
+      <Toast
+        message={toastConfig.show ? toastConfig.message : ""}
+        type={toastConfig.type}
+        onClose={() => setToastConfig((prev) => ({ ...prev, show: false }))}
+      />
+      <motion.article
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="pb-16 md:pb-24"
+      >
       {/* Full-width Hero Image */}
       <div className="relative">
         <div className="relative">
@@ -214,5 +229,6 @@ export default function Post() {
         </motion.div>
       </Container>
     </motion.article>
+    </>
   );
 }
