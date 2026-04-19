@@ -63,7 +63,7 @@ function ActionIconButton({
       {/* Portal — directly body mein, koi parent affect nahi karega */}
       {showTooltip && createPortal(
         <div
-          className="fixed z-[9999] pointer-events-none -translate-x-1/2 -translate-y-full"
+          className="fixed z-9999 pointer-events-none -translate-x-1/2 -translate-y-full"
           style={{ left: tooltipPos.x, top: tooltipPos.y }}
         >
           <span className="block whitespace-nowrap rounded-md px-2.5 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-[11px] font-medium tracking-wide text-white/80 shadow-lg">
