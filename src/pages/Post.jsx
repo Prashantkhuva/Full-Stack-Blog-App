@@ -171,7 +171,7 @@ export default function Post() {
 
           {/* Author Actions */}
           {isAuthor && (
-            <div className="absolute right-3 top-3 z-20 md:right-6 md:top-6">
+            <div className="absolute top-4 right-4 z-20 flex gap-2">
               <PostActionButtons
                 editTo={`/edit-post/${post.$id}`}
                 onDelete={deletePost}

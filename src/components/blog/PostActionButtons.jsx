@@ -1,104 +1,91 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { createPortal } from "react-dom"; // ye add karo
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { PenLine, Trash2 } from "lucide-react";
 
 function ActionIconButton({
   as = "button",
   to,
   onClick,
   label,
-  icon: Icon,
-  videoSrc,
-  tone = "default",
+  lordSrc,
+  lordColors,
+  glowColor = "rgba(255,255,255,0.15)",
+  ringColor = "ring-white/20",
 }) {
-  const videoRef = useRef(null);
-  const toneClass =
-    tone === "danger"
-      ? "text-red-300 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-200 hover:shadow-[0_0_24px_rgba(239,68,68,0.18)]"
-      : "text-text-muted hover:border-border hover:bg-bg/70 hover:text-text hover:shadow-[0_0_22px_rgba(245,245,245,0.08)]";
+  const iconRef = useRef(null);
+  const buttonRef = useRef(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [showTooltip, setShowTooltip] = useState(false);
 
-  const iconMotion =
-    tone === "danger"
-      ? {
-        rest: { scale: 1, rotate: 0, opacity: 0.9 },
-        hover: {
-          scale: 1.1,
-          rotate: -9,
-          opacity: 1,
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-        },
-      }
-      : {
-        rest: { scale: 1, rotate: 0, opacity: 0.9 },
-        hover: {
-          scale: 1.1,
-          rotate: -7,
-          opacity: 1,
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-        },
-      };
+  const handleMouseEnter = () => {
+    if (iconRef.current) iconRef.current.playerInstance?.playFromBeginning();
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (rect) {
+      setTooltipPos({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+      });
+    }
+    setShowTooltip(true);
+  };
 
-  const button = (
+  const buttonContent = (
     <motion.button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       aria-label={label}
-      title={label}
-      className={`inline-flex size-11 items-center justify-center rounded-full border border-border/80 bg-bg-card/70 backdrop-blur-sm transition-all duration-300 ${toneClass}`}
-      initial="rest"
-      whileHover="hover"
-      animate="rest"
-      whileFocus="hover"
-      variants={{
-        rest: { y: 0, scale: 1 },
-        hover: { y: -1, scale: 1.04 }
-      }}
-      whileTap={{ scale: 0.96 }}
-      onHoverStart={() => {
-        if (videoRef.current) {
-          videoRef.current.currentTime = 0;
-          videoRef.current.play().catch(e => console.log('Autoplay prevented:', e));
-        }
-      }}
-      onHoverEnd={() => {
-        if (videoRef.current) {
-          videoRef.current.pause();
-          videoRef.current.currentTime = 0;
-        }
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setShowTooltip(false)}
+      className={`relative flex size-11 items-center justify-center rounded-full bg-white/5 backdrop-blur-sm border border-white/10 ring-1 ${ringColor} transition-all duration-300 hover:bg-white/10 outline-none group`}
+      style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.07)" }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
     >
-      <motion.span variants={iconMotion}>
-        {videoSrc ? (
-          <video
-            ref={videoRef}
-            src={videoSrc}
-            className="w-5 h-5 object-contain"
-            muted
-            playsInline
-          />
-        ) : (
-          <Icon size={16} />
-        )}
-      </motion.span>
+      <span
+        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ boxShadow: `0 0 22px 4px ${glowColor}` }}
+      />
+      <lord-icon
+        ref={iconRef}
+        src={lordSrc}
+        trigger="hover"
+        colors={lordColors}
+        style={{ width: "24px", height: "24px" }}
+      />
     </motion.button>
   );
 
-  if (as === "link" && to) {
-    return (
-      <Link to={to} aria-label={label} title={label}>
-        {button}
-      </Link>
-    );
-  }
+  return (
+    <>
+      {/* Portal — directly body mein, koi parent affect nahi karega */}
+      {showTooltip && createPortal(
+        <div
+          className="fixed z-[9999] pointer-events-none -translate-x-1/2 -translate-y-full"
+          style={{ left: tooltipPos.x, top: tooltipPos.y }}
+        >
+          <span className="block whitespace-nowrap rounded-md px-2.5 py-1 bg-white/10 backdrop-blur-md border border-white/10 text-[11px] font-medium tracking-wide text-white/80 shadow-lg">
+            {label}
+          </span>
+        </div>,
+        document.body
+      )}
 
-  return button;
+      {as === "link" && to ? (
+        <Link to={to} aria-label={label}>{buttonContent}</Link>
+      ) : (
+        buttonContent
+      )}
+    </>
+  );
 }
 
 function PostActionButtons({ editTo, onDelete }) {
   return (
     <motion.div
-      className="flex items-center gap-2"
+      className="flex items-center gap-3"
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.35, delay: 0.2 }}
@@ -107,15 +94,18 @@ function PostActionButtons({ editTo, onDelete }) {
         as="link"
         to={editTo}
         label="Edit post"
-        icon={PenLine}
-        videoSrc="/wired-outline-35-edit-hover-circle.mp4"
+        lordSrc="https://cdn.lordicon.com/exymduqj.json"
+        lordColors="primary:#facc15,secondary:#facc15"
+        glowColor="rgba(250,204,21,0.28)"
+        ringColor="ring-yellow-400/30"
       />
       <ActionIconButton
         onClick={onDelete}
         label="Delete post"
-        icon={Trash2}
-        tone="danger"
-        videoSrc="/wired-gradient-185-trash-bin-hover-empty.mp4"
+        lordSrc="https://cdn.lordicon.com/jzinekkv.json"
+        lordColors="primary:#ef4444,secondary:#ef4444"
+        glowColor="rgba(239,68,68,0.28)"
+        ringColor="ring-red-500/30"
       />
     </motion.div>
   );
