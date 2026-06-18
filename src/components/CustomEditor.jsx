@@ -1,6 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Controller } from "react-hook-form";
-import { motion } from "framer-motion";
 
 const TOOLBAR_ITEMS = [
   { label: "Bold", cmd: "bold", icon: "B" },
@@ -27,7 +26,21 @@ const TOOLBAR_ITEMS = [
   { label: "Remove Format", cmd: "removeFormat", icon: "✕" },
 ];
 
-function ToolbarButton({ item, editorRef, onAction }) {
+function getActiveBlock() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return null;
+  let node = sel.getRangeAt(0).commonAncestorContainer;
+  while (node && node !== document.body) {
+    const tag = node.nodeName?.toLowerCase();
+    if (["h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre"].includes(tag)) {
+      return tag;
+    }
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function ToolbarButton({ item, isActive, onAction }) {
   if (item.type === "divider") {
     return <div className="mx-1 h-6 w-px bg-border" />;
   }
@@ -36,7 +49,11 @@ function ToolbarButton({ item, editorRef, onAction }) {
     <button
       type="button"
       title={item.label}
-      className="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold text-text-muted transition-all duration-200 hover:bg-bg-secondary hover:text-text active:scale-90"
+      className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200 active:scale-90 ${
+        isActive
+          ? "bg-accent/20 text-accent shadow-[inset_0_0_0_1px_rgba(245,158,11,0.3)]"
+          : "text-text-muted hover:bg-bg-secondary hover:text-text"
+      }`}
       onMouseDown={(e) => {
         e.preventDefault();
         onAction(item);
@@ -50,6 +67,33 @@ function ToolbarButton({ item, editorRef, onAction }) {
 export default function CustomEditor({ name, control, label, defaultValue = "" }) {
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [activeStates, setActiveStates] = useState({});
+
+  const updateActiveStates = useCallback(() => {
+    const states = {
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+      strikeThrough: document.queryCommandState("strikeThrough"),
+      insertUnorderedList: document.queryCommandState("insertUnorderedList"),
+      insertOrderedList: document.queryCommandState("insertOrderedList"),
+      justifyLeft: document.queryCommandState("justifyLeft"),
+      justifyCenter: document.queryCommandState("justifyCenter"),
+      justifyRight: document.queryCommandState("justifyRight"),
+    };
+
+    const block = getActiveBlock();
+    TOOLBAR_ITEMS.forEach((item) => {
+      if (item.cmd === "heading" && item.value) {
+        states[`heading:${item.value}`] = block === item.value;
+      }
+      if (item.cmd === "formatBlock" && item.value) {
+        states[`formatBlock:${item.value}`] = block === item.value;
+      }
+    });
+
+    setActiveStates(states);
+  }, []);
 
   const exec = useCallback((item) => {
     const editor = editorRef.current;
@@ -60,19 +104,27 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
     if (item.cmd === "link") {
       const url = prompt("Enter URL:");
       if (url) document.execCommand("createLink", false, url);
+      updateActiveStates();
       return;
     }
 
     if (item.cmd === "formatBlock" && item.value) {
-      const selection = window.getSelection();
-      if (selection && selection.toString()) {
-        document.execCommand("formatBlock", false, `<${item.value}>`);
-      }
+      const active = item.value === getActiveBlock();
+      document.execCommand("formatBlock", false, active ? `<p>` : `<${item.value}>`);
+      updateActiveStates();
+      return;
+    }
+
+    if (item.cmd === "heading" && item.value) {
+      const active = item.value === getActiveBlock();
+      document.execCommand("formatBlock", false, active ? `<p>` : `<${item.value}>`);
+      updateActiveStates();
       return;
     }
 
     document.execCommand(item.cmd, false, item.value || null);
-  }, []);
+    updateActiveStates();
+  }, [updateActiveStates]);
 
   const handlePaste = useCallback((e) => {
     e.preventDefault();
@@ -85,6 +137,20 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
       onChange(editorRef.current.innerHTML);
     }
   }, []);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const onSelectionChange = () => {
+      if (document.activeElement === editor) {
+        updateActiveStates();
+      }
+    };
+
+    document.addEventListener("selectionchange", onSelectionChange);
+    return () => document.removeEventListener("selectionchange", onSelectionChange);
+  }, [updateActiveStates]);
 
   return (
     <div className="w-full">
@@ -106,17 +172,28 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
             }`}
           >
             <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-bg-secondary/50 px-2 py-2">
-              {TOOLBAR_ITEMS.map((item, i) => (
-                <ToolbarButton
-                  key={i}
-                  item={item}
-                  editorRef={editorRef}
-                  onAction={(action) => {
-                    exec(action);
-                    handleChange(onChange);
-                  }}
-                />
-              ))}
+              {TOOLBAR_ITEMS.map((item, i) => {
+                let isActive = false;
+                if (item.cmd === "heading" && item.value) {
+                  isActive = activeStates[`heading:${item.value}`];
+                } else if (item.cmd === "formatBlock" && item.value) {
+                  isActive = activeStates[`formatBlock:${item.value}`];
+                } else if (item.cmd) {
+                  isActive = activeStates[item.cmd];
+                }
+
+                return (
+                  <ToolbarButton
+                    key={i}
+                    item={item}
+                    isActive={isActive}
+                    onAction={(action) => {
+                      exec(action);
+                      handleChange(onChange);
+                    }}
+                  />
+                );
+              })}
             </div>
 
             <div
@@ -128,8 +205,13 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
               data-placeholder="Write your content here..."
               onInput={() => handleChange(onChange)}
               onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
+              onBlur={() => {
+                setIsFocused(false);
+                setActiveStates({});
+              }}
               onPaste={handlePaste}
+              onMouseUp={updateActiveStates}
+              onKeyUp={updateActiveStates}
               dangerouslySetInnerHTML={{ __html: defaultValue }}
             />
           </div>
