@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Input, Button, Select, RTE, MediaFrame, Toast } from "../index";
+import { Input, Button, Select, CustomEditor, MediaFrame, Toast } from "../index";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -177,9 +177,9 @@ function PostForm({ post }) {
             />
             <div>
               <p className="mb-2 text-sm text-text-muted">
-                Tip: Keep the opening concise (~256 chars) for better previews
+                Tip: Use headings and formatting to structure your content
               </p>
-              <RTE
+              <CustomEditor
                 label="Content"
                 name="content"
                 control={control}

@@ -4,6 +4,7 @@ import Footer from "./Footer/Footer";
 import LogoutBtn from "./Header/LogOutBtn";
 import Logo from "./Logo";
 import RTE from "./RTE";
+import CustomEditor from "./CustomEditor";
 import Select from "./Select";
 import SignUp from "./SignUp";
 import Login from "./Login";
@@ -33,6 +34,7 @@ export {
   LogoutBtn,
   Logo,
   RTE,
+  CustomEditor,
   Select,
   SignUp,
   Login,

@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import store from "./store/store.js";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthLayout, SignUp, Login } from "./components/index.js";
+import { Analytics } from "@vercel/analytics/react";
 import {
   Home,
   Signup,
@@ -92,6 +93,7 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <Suspense fallback={<PageLoader />}>
         <RouterProvider router={router} />
+        <Analytics />
       </Suspense>
     </Provider>
   </StrictMode>,
