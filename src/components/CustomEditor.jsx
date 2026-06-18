@@ -1,29 +1,48 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Controller } from "react-hook-form";
+import {
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Link,
+  TextQuote,
+  Code,
+  SeparatorHorizontal,
+  RemoveFormatting,
+} from "lucide-react";
 
 const TOOLBAR_ITEMS = [
-  { label: "Bold", cmd: "bold", icon: "B" },
-  { label: "Italic", cmd: "italic", icon: "I" },
-  { label: "Underline", cmd: "underline", icon: "U" },
-  { label: "Strikethrough", cmd: "strikeThrough", icon: "S" },
+  { label: "Bold", cmd: "bold", icon: Bold },
+  { label: "Italic", cmd: "italic", icon: Italic },
+  { label: "Underline", cmd: "underline", icon: Underline },
+  { label: "Strikethrough", cmd: "strikeThrough", icon: Strikethrough },
   { type: "divider" },
-  { label: "Heading 1", cmd: "heading", value: "h1", icon: "H1" },
-  { label: "Heading 2", cmd: "heading", value: "h2", icon: "H2" },
-  { label: "Heading 3", cmd: "heading", value: "h3", icon: "H3" },
+  { label: "Heading 1", cmd: "heading", value: "h1", icon: Heading1 },
+  { label: "Heading 2", cmd: "heading", value: "h2", icon: Heading2 },
+  { label: "Heading 3", cmd: "heading", value: "h3", icon: Heading3 },
   { type: "divider" },
-  { label: "Bullet List", cmd: "insertUnorderedList", icon: "UL" },
-  { label: "Numbered List", cmd: "insertOrderedList", icon: "OL" },
+  { label: "Bullet List", cmd: "insertUnorderedList", icon: List },
+  { label: "Numbered List", cmd: "insertOrderedList", icon: ListOrdered },
   { type: "divider" },
-  { label: "Align Left", cmd: "justifyLeft", icon: "AL" },
-  { label: "Center", cmd: "justifyCenter", icon: "AC" },
-  { label: "Align Right", cmd: "justifyRight", icon: "AR" },
+  { label: "Align Left", cmd: "justifyLeft", icon: AlignLeft },
+  { label: "Center", cmd: "justifyCenter", icon: AlignCenter },
+  { label: "Align Right", cmd: "justifyRight", icon: AlignRight },
   { type: "divider" },
-  { label: "Link", cmd: "link", icon: "🔗" },
-  { label: "Blockquote", cmd: "formatBlock", value: "blockquote", icon: "❝" },
-  { label: "Code Block", cmd: "formatBlock", value: "pre", icon: "</>" },
+  { label: "Link", cmd: "link", icon: Link },
+  { label: "Blockquote", cmd: "formatBlock", value: "blockquote", icon: TextQuote },
+  { label: "Code Block", cmd: "formatBlock", value: "pre", icon: Code },
   { type: "divider" },
-  { label: "Horizontal Rule", cmd: "insertHorizontalRule", icon: "—" },
-  { label: "Remove Format", cmd: "removeFormat", icon: "✕" },
+  { label: "Horizontal Rule", cmd: "insertHorizontalRule", icon: SeparatorHorizontal },
+  { label: "Remove Format", cmd: "removeFormat", icon: RemoveFormatting },
 ];
 
 const TOGGLE_CMDS = new Set([
@@ -37,11 +56,13 @@ function ToolbarButton({ item, isActive, onAction }) {
     return <div className="mx-1 h-6 w-px bg-border" />;
   }
 
+  const Icon = item.icon;
+
   return (
     <button
       type="button"
       title={item.label}
-      className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200 active:scale-90 ${
+      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 active:scale-90 ${
         isActive
           ? "bg-accent/20 text-accent shadow-[inset_0_0_0_1px_rgba(245,158,11,0.3)]"
           : "text-text-muted hover:bg-bg-secondary hover:text-text"
@@ -52,7 +73,7 @@ function ToolbarButton({ item, isActive, onAction }) {
         onAction(item);
       }}
     >
-      {item.icon}
+      <Icon size={16} />
     </button>
   );
 }
