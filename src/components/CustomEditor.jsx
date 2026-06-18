@@ -26,19 +26,11 @@ const TOOLBAR_ITEMS = [
   { label: "Remove Format", cmd: "removeFormat", icon: "✕" },
 ];
 
-function getActiveBlock() {
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return null;
-  let node = sel.getRangeAt(0).commonAncestorContainer;
-  while (node && node !== document.body) {
-    const tag = node.nodeName?.toLowerCase();
-    if (["h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre"].includes(tag)) {
-      return tag;
-    }
-    node = node.parentNode;
-  }
-  return null;
-}
+const TOGGLE_CMDS = new Set([
+  "bold", "italic", "underline", "strikeThrough",
+  "insertUnorderedList", "insertOrderedList",
+  "justifyLeft", "justifyCenter", "justifyRight",
+]);
 
 function ToolbarButton({ item, isActive, onAction }) {
   if (item.type === "divider") {
@@ -54,7 +46,8 @@ function ToolbarButton({ item, isActive, onAction }) {
           ? "bg-accent/20 text-accent shadow-[inset_0_0_0_1px_rgba(245,158,11,0.3)]"
           : "text-text-muted hover:bg-bg-secondary hover:text-text"
       }`}
-      onMouseDown={(e) => {
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={(e) => {
         e.preventDefault();
         onAction(item);
       }}
@@ -64,67 +57,104 @@ function ToolbarButton({ item, isActive, onAction }) {
   );
 }
 
+function getBlockTag(node) {
+  while (node && node !== document.body && node !== document.documentElement) {
+    const tag = node.nodeName?.toLowerCase();
+    if (["h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "li"].includes(tag)) {
+      return tag;
+    }
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function scanDOM() {
+  const sel = window.getSelection();
+  let block = null;
+  if (sel && sel.rangeCount && sel.getRangeAt(0).commonAncestorContainer) {
+    block = getBlockTag(sel.getRangeAt(0).commonAncestorContainer);
+  }
+  return {
+    bold: document.queryCommandState("bold"),
+    italic: document.queryCommandState("italic"),
+    underline: document.queryCommandState("underline"),
+    strikeThrough: document.queryCommandState("strikeThrough"),
+    insertUnorderedList: document.queryCommandState("insertUnorderedList"),
+    insertOrderedList: document.queryCommandState("insertOrderedList"),
+    justifyLeft: document.queryCommandState("justifyLeft"),
+    justifyCenter: document.queryCommandState("justifyCenter"),
+    justifyRight: document.queryCommandState("justifyRight"),
+    block,
+  };
+}
+
 export default function CustomEditor({ name, control, label, defaultValue = "" }) {
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
-  const [activeStates, setActiveStates] = useState({});
+  const states = useRef({});
 
-  const updateActiveStates = useCallback(() => {
-    const states = {
-      bold: document.queryCommandState("bold"),
-      italic: document.queryCommandState("italic"),
-      underline: document.queryCommandState("underline"),
-      strikeThrough: document.queryCommandState("strikeThrough"),
-      insertUnorderedList: document.queryCommandState("insertUnorderedList"),
-      insertOrderedList: document.queryCommandState("insertOrderedList"),
-      justifyLeft: document.queryCommandState("justifyLeft"),
-      justifyCenter: document.queryCommandState("justifyCenter"),
-      justifyRight: document.queryCommandState("justifyRight"),
-    };
-
-    const block = getActiveBlock();
-    TOOLBAR_ITEMS.forEach((item) => {
-      if (item.cmd === "heading" && item.value) {
-        states[`heading:${item.value}`] = block === item.value;
-      }
-      if (item.cmd === "formatBlock" && item.value) {
-        states[`formatBlock:${item.value}`] = block === item.value;
-      }
-    });
-
-    setActiveStates(states);
+  const [, forceRender] = useState(0);
+  const set = useCallback((key, val) => {
+    states.current[key] = val;
+    forceRender((n) => n + 1);
   }, []);
+
+  const syncFromDOM = useCallback(() => {
+    const s = scanDOM();
+    states.current.bold = s.bold;
+    states.current.italic = s.italic;
+    states.current.underline = s.underline;
+    states.current.strikeThrough = s.strikeThrough;
+    states.current.insertUnorderedList = s.insertUnorderedList;
+    states.current.insertOrderedList = s.insertOrderedList;
+    states.current.justifyLeft = s.justifyLeft;
+    states.current.justifyCenter = s.justifyCenter;
+    states.current.justifyRight = s.justifyRight;
+    states.current.block = s.block;
+    forceRender((n) => n + 1);
+  }, []);
+
+  useEffect(() => {
+    const el = editorRef.current;
+    if (!el) return;
+    const handler = () => {
+      if (document.activeElement === el || el.contains(document.activeElement)) {
+        syncFromDOM();
+      }
+    };
+    document.addEventListener("selectionchange", handler);
+    return () => document.removeEventListener("selectionchange", handler);
+  }, [syncFromDOM]);
 
   const exec = useCallback((item) => {
     const editor = editorRef.current;
     if (!editor) return;
-
     editor.focus();
 
     if (item.cmd === "link") {
       const url = prompt("Enter URL:");
       if (url) document.execCommand("createLink", false, url);
-      updateActiveStates();
+      syncFromDOM();
       return;
     }
 
-    if (item.cmd === "formatBlock" && item.value) {
-      const active = item.value === getActiveBlock();
-      document.execCommand("formatBlock", false, active ? `<p>` : `<${item.value}>`);
-      updateActiveStates();
+    if ((item.cmd === "heading" || item.cmd === "formatBlock") && item.value) {
+      const curBlock = states.current.block;
+      document.execCommand("formatBlock", false, curBlock === item.value ? `<p>` : `<${item.value}>`);
+      syncFromDOM();
       return;
     }
 
-    if (item.cmd === "heading" && item.value) {
-      const active = item.value === getActiveBlock();
-      document.execCommand("formatBlock", false, active ? `<p>` : `<${item.value}>`);
-      updateActiveStates();
+    if (TOGGLE_CMDS.has(item.cmd)) {
+      document.execCommand(item.cmd, false, item.value || null);
+      states.current[item.cmd] = !states.current[item.cmd];
+      forceRender((n) => n + 1);
       return;
     }
 
     document.execCommand(item.cmd, false, item.value || null);
-    updateActiveStates();
-  }, [updateActiveStates]);
+    syncFromDOM();
+  }, [syncFromDOM]);
 
   const handlePaste = useCallback((e) => {
     e.preventDefault();
@@ -138,19 +168,11 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
     }
   }, []);
 
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const onSelectionChange = () => {
-      if (document.activeElement === editor) {
-        updateActiveStates();
-      }
-    };
-
-    document.addEventListener("selectionchange", onSelectionChange);
-    return () => document.removeEventListener("selectionchange", onSelectionChange);
-  }, [updateActiveStates]);
+  const isActive = useCallback((item) => {
+    if (item.cmd === "heading" && item.value) return states.current.block === item.value;
+    if (item.cmd === "formatBlock" && item.value) return states.current.block === item.value;
+    return !!states.current[item.cmd];
+  }, []);
 
   return (
     <div className="w-full">
@@ -172,46 +194,31 @@ export default function CustomEditor({ name, control, label, defaultValue = "" }
             }`}
           >
             <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-bg-secondary/50 px-2 py-2">
-              {TOOLBAR_ITEMS.map((item, i) => {
-                let isActive = false;
-                if (item.cmd === "heading" && item.value) {
-                  isActive = activeStates[`heading:${item.value}`];
-                } else if (item.cmd === "formatBlock" && item.value) {
-                  isActive = activeStates[`formatBlock:${item.value}`];
-                } else if (item.cmd) {
-                  isActive = activeStates[item.cmd];
-                }
-
-                return (
-                  <ToolbarButton
-                    key={i}
-                    item={item}
-                    isActive={isActive}
-                    onAction={(action) => {
-                      exec(action);
-                      handleChange(onChange);
-                    }}
-                  />
-                );
-              })}
+              {TOOLBAR_ITEMS.map((item, i) => (
+                <ToolbarButton
+                  key={i}
+                  item={item}
+                  isActive={isActive(item)}
+                  onAction={(action) => {
+                    exec(action);
+                    handleChange(onChange);
+                  }}
+                />
+              ))}
             </div>
 
             <div
               ref={editorRef}
               contentEditable
               suppressContentEditableWarning
-              className="min-h-[400px] w-full bg-bg-secondary px-5 py-4 text-text outline-none placeholder:text-text-muted/30"
+              className="min-h-[400px] w-full bg-bg-secondary px-5 py-4 text-text outline-none"
               style={{ whiteSpace: "pre-wrap" }}
-              data-placeholder="Write your content here..."
               onInput={() => handleChange(onChange)}
               onFocus={() => setIsFocused(true)}
-              onBlur={() => {
-                setIsFocused(false);
-                setActiveStates({});
-              }}
+              onBlur={() => setIsFocused(false)}
               onPaste={handlePaste}
-              onMouseUp={updateActiveStates}
-              onKeyUp={updateActiveStates}
+              onMouseUp={syncFromDOM}
+              onKeyUp={syncFromDOM}
               dangerouslySetInnerHTML={{ __html: defaultValue }}
             />
           </div>
