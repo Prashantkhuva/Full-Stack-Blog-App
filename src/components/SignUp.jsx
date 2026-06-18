@@ -119,6 +119,10 @@ function SignUp() {
               error={errors.name?.message || fieldErrors.name}
               {...register("name", {
                 required: "Name is required",
+                minLength: {
+                  value: 2,
+                  message: "Name must be at least 2 characters",
+                },
               })}
             />
 
@@ -130,10 +134,9 @@ function SignUp() {
               error={errors.email?.message || fieldErrors.email}
               {...register("email", {
                 required: "Email is required",
-                validate: {
-                  matchPatern: (value) =>
-                    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                    "Please enter a valid email address",
+                pattern: {
+                  value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                  message: "Please enter a valid email address",
                 },
               })}
             />
@@ -146,6 +149,10 @@ function SignUp() {
               error={errors.password?.message || fieldErrors.password}
               {...register("password", {
                 required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters",
+                },
               })}
             />
 
