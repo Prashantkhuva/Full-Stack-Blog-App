@@ -13,13 +13,17 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const login = async (data) => {
-    setError("");
+    setFieldErrors({});
     setIsSubmitting(true);
 
     try {
@@ -41,7 +45,14 @@ function Login() {
         navigate("/");
       }
     } catch (error) {
-      setError(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("email")) {
+        setFieldErrors({ email: error.message });
+      } else if (msg.includes("password")) {
+        setFieldErrors({ password: error.message });
+      } else {
+        setFieldErrors({ general: error.message });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -87,14 +98,14 @@ function Login() {
             Sign in to continue to <span className="text-accent">MegaBlog</span>
           </motion.p>
 
-          {error && (
+          {fieldErrors.general && (
             <motion.p
               className="text-red-500 text-center mb-6 text-sm bg-red-500/10 border border-red-500/20 rounded-lg py-3"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              {error}
+              {fieldErrors.general}
             </motion.p>
           )}
 
@@ -104,8 +115,9 @@ function Login() {
               placeholder="Enter your email"
               type="email"
               className="dark-input"
+              error={errors.email?.message || fieldErrors.email}
               {...register("email", {
-                required: true,
+                required: "Email is required",
                 validate: {
                   matchPattern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
@@ -119,8 +131,9 @@ function Login() {
               placeholder="Enter your password"
               type="password"
               className="dark-input"
+              error={errors.password?.message || fieldErrors.password}
               {...register("password", {
-                required: true,
+                required: "Password is required",
               })}
             />
 

@@ -13,13 +13,17 @@ function SignUp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const create = async (data) => {
-    setError("");
+    setFieldErrors({});
     setIsSubmitting(true);
 
     try {
@@ -41,7 +45,16 @@ function SignUp() {
         navigate("/");
       }
     } catch (error) {
-      setError(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("email")) {
+        setFieldErrors({ email: error.message });
+      } else if (msg.includes("password")) {
+        setFieldErrors({ password: error.message });
+      } else if (msg.includes("name")) {
+        setFieldErrors({ name: error.message });
+      } else {
+        setFieldErrors({ general: error.message });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -87,14 +100,14 @@ function SignUp() {
             Join <span className="text-accent">MegaBlog</span> today
           </motion.p>
 
-          {error && (
+          {fieldErrors.general && (
             <motion.p
               className="text-red-500 text-center mb-6 text-sm bg-red-500/10 border border-red-500/20 rounded-lg py-3"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              {error}
+              {fieldErrors.general}
             </motion.p>
           )}
 
@@ -103,8 +116,9 @@ function SignUp() {
               label="Full Name"
               placeholder="Enter your full name"
               className="dark-input"
+              error={errors.name?.message || fieldErrors.name}
               {...register("name", {
-                required: true,
+                required: "Name is required",
               })}
             />
 
@@ -113,8 +127,9 @@ function SignUp() {
               label="Email"
               placeholder="Enter your email"
               className="dark-input"
+              error={errors.email?.message || fieldErrors.email}
               {...register("email", {
-                required: true,
+                required: "Email is required",
                 validate: {
                   matchPatern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
@@ -128,8 +143,9 @@ function SignUp() {
               type="password"
               placeholder="Create a password"
               className="dark-input"
+              error={errors.password?.message || fieldErrors.password}
               {...register("password", {
-                required: true,
+                required: "Password is required",
               })}
             />
 
