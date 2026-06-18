@@ -22,7 +22,7 @@ export default function Toast({ message, type = "error", onClose }) {
           animate={{ y: 0, x: "-50%", opacity: 1 }}
           exit={{ y: 50, x: "-50%", opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className={`fixed bottom-5 left-1/2 z-50 flex w-[90%] max-w-sm items-center gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md ${
+          className={`fixed bottom-5 left-1/2 z-50 flex w-[90%] max-w-sm items-center giap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md ${
             isError
               ? "border-red-500/20 bg-red-500/10"
               : "border-green-500/20 bg-green-500/10"
