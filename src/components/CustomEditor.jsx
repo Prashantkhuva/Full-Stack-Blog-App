@@ -2,6 +2,7 @@ import { useRef, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import JoditEditor from "jodit-react";
 import "jodit/es5/jodit.min.css";
+import "../styles/jodit-dark-theme.css";
 
 export default function CustomEditor({ name, control, label, defaultValue = "" }) {
   const editorRef = useRef(null);
