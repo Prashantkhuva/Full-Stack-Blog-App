@@ -115,6 +115,8 @@ function PostForm({ post }) {
           }
         }
       }
+    } catch (error) {
+      showToast(error?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
